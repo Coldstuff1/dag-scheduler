@@ -1,0 +1,8 @@
+[package]
+name = "rt-dialect"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+melior.workspace = true
+rt-schema = { path = "../rt-schema" }

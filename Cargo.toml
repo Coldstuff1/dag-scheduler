@@ -1,7 +1,21 @@
-[package]
-name = "dag-scheduler"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "2"
+members = [
+    "crates/rt-schema",
+    "crates/rt-dialect",
+    "crates/rt-passes",
+    "crates/rt-emit",
+    "crates/rt-cli",
+]
 
-[dependencies]
-melior = "0.30"
+[workspace.package]
+edition = "2024"
+version = "0.1.0"
+
+[workspace.dependencies]
+melior = "0.29.1"
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+clap = { version = "4", features = ["derive"] }
+thiserror = "2"
+insta = "1"

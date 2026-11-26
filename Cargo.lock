@@ -83,9 +83,9 @@ dependencies = [
 
 [[package]]
 name = "comrak"
-version = "1.2.0"
+version = "0.59.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a253d04a12dff46b9ff641890e76bad5f6475afa891faac93d736a04fed5804e"
+checksum = "3adf553d37681e21753316065ad5a763d9513f81c910e250576c572114a8eb06"
 dependencies = [
  "caseless",
  "entities",
@@ -105,13 +105,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1af709f1f33454bf52eadfc8c78b3b9ef9cb26fb54d16dc9cd9a7299f899fd1b"
 dependencies = [
  "unicode-segmentation",
-]
-
-[[package]]
-name = "dag-scheduler"
-version = "0.1.0"
-dependencies = [
- "melior",
 ]
 
 [[package]]
@@ -185,9 +178,9 @@ checksum = "5d15f86d12da44cd8d4ec3c73984537eb7f4cadcb9776a575a0a8a05ca11005c"
 
 [[package]]
 name = "melior"
-version = "0.30.0"
+version = "0.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a13323eecac367a55cdd6e17a88cb217f056fa6348780585e757df2d46a0476"
+checksum = "c2ffdd09ec61b6d6604f8a76f02c285298b572f3f5da796ac43147486b83e2f5"
 dependencies = [
  "melior-macro",
  "mlir-sys",
@@ -195,9 +188,9 @@ dependencies = [
 
 [[package]]
 name = "melior-macro"
-version = "0.30.0"
+version = "0.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "444b0e91689009d7f9eed025ca5fb083536cfd8e1bd42b2f2d0a09cfea5ff461"
+checksum = "1979404bad7b1f611f085c82019b30859a42b12e14c3db5b52aa7d207e1379d2"
 dependencies = [
  "comrak",
  "convert_case",
@@ -351,6 +344,30 @@ name = "regex-syntax"
 version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d902046e6a28a1e4c3cab97258a0ce11e994903f01c2d97a9447a0b3df85f4f6"
+
+[[package]]
+name = "rt-cli"
+version = "0.1.0"
+
+[[package]]
+name = "rt-dialect"
+version = "0.1.0"
+dependencies = [
+ "melior",
+ "rt-schema",
+]
+
+[[package]]
+name = "rt-emit"
+version = "0.1.0"
+
+[[package]]
+name = "rt-passes"
+version = "0.1.0"
+
+[[package]]
+name = "rt-schema"
+version = "0.1.0"
 
 [[package]]
 name = "rustc-hash"

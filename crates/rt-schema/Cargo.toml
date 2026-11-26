@@ -1,0 +1,6 @@
+[package]
+name = "rt-schema"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
