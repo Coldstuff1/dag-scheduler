@@ -6,3 +6,4 @@ edition.workspace = true
 [dependencies]
 melior.workspace = true
 rt-schema = { path = "../rt-schema" }
+thiserror.workspace = true

@@ -1,0 +1,7 @@
+// Invalid: sensors must be sources, but `imu` depends on `cam`.
+digraph bad_sensor {
+  cam [kind=sensor, wcet=2, period=10];
+  imu [kind=sensor, wcet=1, period=5];
+  fuse [wcet=3];
+  cam -> imu -> fuse;
+}

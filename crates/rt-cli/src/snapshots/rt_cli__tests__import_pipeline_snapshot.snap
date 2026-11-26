@@ -1,0 +1,18 @@
+---
+source: crates/rt-cli/src/main.rs
+expression: "import(&example(\"pipeline.dot\")).unwrap()"
+---
+module {
+  func.func @pipeline() -> !rt.token attributes {rt.graph} {
+    %0 = "rt.sensor"() {name = "cam", period = 33000 : i64, wcet = 200 : i64} : () -> !rt.token
+    %1 = "rt.sensor"() {name = "lidar", period = 100000 : i64, wcet = 150 : i64} : () -> !rt.token
+    %2 = "rt.sensor"() {name = "imu", period = 5000 : i64, wcet = 20 : i64} : () -> !rt.token
+    %3 = "rt.task"(%0) {name = "detect", wcet = 8000 : i64} : (!rt.token) -> !rt.token
+    %4 = "rt.task"(%0) {name = "segment", wcet = 6000 : i64} : (!rt.token) -> !rt.token
+    %5 = "rt.task"(%1, %2) {name = "localize", wcet = 3000 : i64} : (!rt.token, !rt.token) -> !rt.token
+    %6 = "rt.task"(%3, %4, %5) {name = "fuse", wcet = 2500 : i64} : (!rt.token, !rt.token, !rt.token) -> !rt.token
+    %7 = "rt.task"(%6) {name = "plan", wcet = 4000 : i64} : (!rt.token) -> !rt.token
+    %8 = "rt.task"(%7, %2) {name = "actuate", wcet = 300 : i64} : (!rt.token, !rt.token) -> !rt.token
+    return %8 : !rt.token
+  }
+}

@@ -1,0 +1,8 @@
+// Invalid: `log` is a second sink (nothing consumes it).
+digraph two_sinks {
+  cam [kind=sensor, wcet=2, period=10];
+  detect [wcet=5];
+  log [wcet=1];
+  cam -> detect;
+  cam -> log;
+}

@@ -19,3 +19,4 @@ serde_yaml = "0.9"
 clap = { version = "4", features = ["derive"] }
 thiserror = "2"
 insta = "1"
+graphviz-rust = { version = "0.9", default-features = false }

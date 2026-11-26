@@ -1,0 +1,23 @@
+// Two sensors feeding a perception pipeline that converges on one actuator task.
+// Times are integer ticks (convention: microseconds).
+digraph pipeline {
+  // Sensors: periodic sources.
+  node [kind=sensor];
+  cam   [wcet=200, period=33000];
+  lidar [wcet=150, period=100000];
+  imu   [wcet=20,  period=5000];
+
+  // Tasks (kind defaults to task, but be explicit after changing the default).
+  node [kind=task, shape=box];
+  detect    [wcet=8000];
+  segment   [wcet=6000];
+  localize  [wcet=3000];
+  fuse      [wcet=2500];
+  plan      [wcet=4000];
+  actuate   [wcet=300];
+
+  cam -> {detect segment};
+  {lidar imu} -> localize;
+  {detect segment localize} -> fuse -> plan -> actuate;
+  imu -> actuate;
+}

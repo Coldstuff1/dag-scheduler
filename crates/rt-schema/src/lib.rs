@@ -1,14 +1,7 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! Format-agnostic task-DAG model plus input frontends (currently GraphViz DOT).
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod dot;
+pub mod model;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use dot::{DotError, parse_dot};
+pub use model::{Dag, Node, NodeIdx, NodeKind, ValidationError};
