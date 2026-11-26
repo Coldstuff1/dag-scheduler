@@ -668,6 +668,7 @@ dependencies = [
  "insta",
  "melior",
  "rt-dialect",
+ "rt-emit",
  "rt-schema",
 ]
 
@@ -683,6 +684,9 @@ dependencies = [
 [[package]]
 name = "rt-emit"
 version = "0.1.0"
+dependencies = [
+ "rt-schema",
+]
 
 [[package]]
 name = "rt-passes"

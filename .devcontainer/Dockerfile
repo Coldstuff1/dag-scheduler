@@ -21,6 +21,14 @@ RUN set -eux; \
       zlib1g-dev libzstd-dev libxml2-dev libffi-dev libedit-dev libncurses-dev; \
     rm -rf /var/lib/apt/lists/*
 
+# Graphviz for rendering DAGs (`dot -Tsvg in.dot -o out.svg`). Kept in its own
+# layer so the LLVM layer above stays cached. Fonts are needed for node labels
+# since --no-install-recommends skips Graphviz's default font packages.
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends graphviz fonts-dejavu-core; \
+    rm -rf /var/lib/apt/lists/*
+
 # Put LLVM tools (mlir-opt, mlir-translate, llvm-config, clang, ...) on PATH.
 ENV LLVM_VERSION=${LLVM_VERSION} \
     LLVM_PREFIX=/usr/lib/llvm-${LLVM_VERSION}

@@ -60,6 +60,8 @@ digraph pipeline {
 - `node [...]` defaults apply to nodes mentioned afterwards.
 - Other attributes (`label`, `shape`, ...) are ignored, so DOT files written for
   visualisation still import.
+- Graphviz only draws `label`, so `rt-cli viz` re-emits the DAG with WCET/period in each
+  label (sensors as ellipses, tasks as boxes). Its output can be imported again.
 
 See [`examples/`](examples/).
 
@@ -68,6 +70,7 @@ See [`examples/`](examples/).
 ```sh
 cargo run -p rt-cli -- import examples/pipeline.dot            # print rt MLIR
 cargo run -p rt-cli -- import examples/pipeline.dot -o out.mlir
+cargo run -p rt-cli -- viz examples/pipeline.dot | dot -Tsvg -o pipeline.svg   # render with WCET/period labels
 cargo run -p rt-cli -- irdl > rt.irdl.mlir                     # dialect definition
 mlir-opt --irdl-file=rt.irdl.mlir out.mlir                     # use with upstream tools
 cargo test --workspace
@@ -78,4 +81,5 @@ cargo test --workspace
 - `rt-schema`: format-agnostic `Dag` model, validation, and the DOT frontend
 - `rt-dialect`: IRDL loading, op builders, `Dag` → MLIR, `verify_rt`
 - `rt-cli`: command-line driver
-- `rt-passes`, `rt-emit`: placeholders for analyses and back-ends
+- `rt-emit`: back-ends (`to_dot`: DOT with timing labels)
+- `rt-passes`: placeholder for analyses

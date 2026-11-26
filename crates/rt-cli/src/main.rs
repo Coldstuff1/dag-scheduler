@@ -19,25 +19,47 @@ enum Command {
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
+    /// Re-emit a DOT DAG with WCET/period in the node labels, for rendering:
+    /// `rt-cli viz in.dot | dot -Tsvg -o out.svg`.
+    Viz {
+        /// Input `.dot` file.
+        input: PathBuf,
+        /// Output file (stdout if omitted).
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
     /// Print the IRDL definition of the `rt` dialect (for `mlir-opt --irdl-file`).
     Irdl,
 }
 
-fn import(input: &PathBuf) -> Result<String, Box<dyn std::error::Error>> {
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+fn read_dag(input: &PathBuf) -> Result<rt_schema::Dag> {
     let src = fs::read_to_string(input).map_err(|e| format!("{}: {e}", input.display()))?;
-    let dag = rt_schema::parse_dot(&src)?;
+    Ok(rt_schema::parse_dot(&src)?)
+}
+
+fn import(input: &PathBuf) -> Result<String> {
+    let dag = read_dag(input)?;
     let context = rt_dialect::create_context()?;
     let module = rt_dialect::build_module(&context, &dag)?;
     Ok(module.as_operation().to_string())
 }
 
+fn write_out(path: Option<PathBuf>, text: &str) -> Result<()> {
+    match path {
+        Some(path) => Ok(fs::write(&path, text).map_err(|e| format!("{}: {e}", path.display()))?),
+        None => Ok(print!("{text}")),
+    }
+}
+
 fn main() -> ExitCode {
     let result = match Cli::parse().command {
-        Command::Import { input, output } => import(&input).and_then(|ir| match output {
-            Some(path) => fs::write(&path, ir).map_err(|e| format!("{}: {e}", path.display()).into()),
-            None => Ok(print!("{ir}")),
-        }),
-        Command::Irdl => Ok(print!("{}", rt_dialect::RT_IRDL)),
+        Command::Import { input, output } => import(&input).and_then(|ir| write_out(output, &ir)),
+        Command::Viz { input, output } => {
+            read_dag(&input).and_then(|dag| write_out(output, &rt_emit::to_dot(&dag)))
+        }
+        Command::Irdl => write_out(None, rt_dialect::RT_IRDL),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,

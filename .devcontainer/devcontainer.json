@@ -18,7 +18,8 @@
       "extensions": [
         "rust-lang.rust-analyzer",
         "llvm-vs-code-extensions.vscode-mlir",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "tintinweb.graphviz-interactive-preview"
       ],
       "settings": {
         "mlir.server_path": "/usr/lib/llvm-23/bin/mlir-lsp-server",

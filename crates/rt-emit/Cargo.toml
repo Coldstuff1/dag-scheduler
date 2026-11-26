@@ -3,5 +3,5 @@ name = "rt-emit"
 version.workspace = true
 edition.workspace = true
 
-
 [dependencies]
+rt-schema = { path = "../rt-schema" }

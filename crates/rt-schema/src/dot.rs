@@ -16,7 +16,7 @@
 //! - Subgraphs/clusters are flattened; `a -> {b c}` expands to `a -> b; a -> c`.
 //! - Other attributes (`label`, `shape`, ...) are ignored.
 
-use std::collections::HashMap;
+use std::{borrow::Cow, collections::HashMap};
 
 use graphviz_rust::dot_structures::{
     Attribute, EdgeTy, Graph, GraphAttributes, Id, NodeId, Stmt, Vertex,
@@ -53,7 +53,7 @@ pub fn parse_dot(src: &str) -> Result<Dag, DotError> {
     builder.stmts(&stmts, &mut Vec::new());
 
     let dag = Dag {
-        name: match id_str(&name) {
+        name: match id_str(&name).as_ref() {
             "" => "dag".to_string(),
             s => s.to_string(),
         },
@@ -104,7 +104,7 @@ impl Builder {
                 Stmt::Subgraph(sub) => self.stmts(&sub.stmts, &mut defaults.clone()),
                 Stmt::GAttribute(GraphAttributes::Node(attrs)) => {
                     for Attribute(k, v) in attrs {
-                        defaults.retain(|(dk, _)| dk != id_str(k));
+                        defaults.retain(|(dk, _)| *dk != id_str(k));
                         defaults.push((id_str(k).to_string(), id_str(v).to_string()));
                     }
                 }
@@ -121,7 +121,7 @@ impl Builder {
                 self.stmts(&sub.stmts, &mut defaults.to_vec());
                 let mut names = Vec::new();
                 mentioned(&sub.stmts, &mut names);
-                let mut idxs: Vec<NodeIdx> = names.iter().map(|n| self.index[*n]).collect();
+                let mut idxs: Vec<NodeIdx> = names.iter().map(|n| self.index[n.as_ref()]).collect();
                 idxs.sort_unstable();
                 idxs.dedup();
                 idxs
@@ -131,7 +131,7 @@ impl Builder {
 
     fn node(&mut self, id: &NodeId, defaults: &[(String, String)]) -> NodeIdx {
         let name = id_str(&id.0);
-        if let Some(&idx) = self.index.get(name) {
+        if let Some(&idx) = self.index.get(name.as_ref()) {
             return idx;
         }
         let idx = self.nodes.len();
@@ -142,8 +142,8 @@ impl Builder {
 }
 
 /// Names of all nodes mentioned (declared or used in edges) in `stmts`, recursively.
-fn mentioned<'a>(stmts: &'a [Stmt], out: &mut Vec<&'a str>) {
-    let vertex = |v: &'a Vertex, out: &mut Vec<&'a str>| match v {
+fn mentioned<'a>(stmts: &'a [Stmt], out: &mut Vec<Cow<'a, str>>) {
+    let vertex = |v: &'a Vertex, out: &mut Vec<Cow<'a, str>>| match v {
         Vertex::N(id) => out.push(id_str(&id.0)),
         Vertex::S(sub) => mentioned(&sub.stmts, out),
     };
@@ -169,11 +169,20 @@ fn set_attrs(dst: &mut HashMap<String, String>, attrs: &[Attribute]) {
     }
 }
 
-/// The textual content of a DOT ID, with quotes stripped from quoted strings.
-fn id_str(id: &Id) -> &str {
+/// The textual content of a DOT ID. Quoted strings lose their quotes and `\"`
+/// is unescaped (the only escape DOT defines; other backslashes are kept, since
+/// Graphviz interprets them later, e.g. `\n` in labels).
+fn id_str(id: &Id) -> Cow<'_, str> {
     match id {
-        Id::Escaped(s) => s.strip_prefix('"').and_then(|s| s.strip_suffix('"')).unwrap_or(s),
-        Id::Html(s) | Id::Plain(s) | Id::Anonymous(s) => s,
+        Id::Escaped(s) => {
+            let inner = s.strip_prefix('"').and_then(|s| s.strip_suffix('"')).unwrap_or(s);
+            if inner.contains("\\\"") {
+                Cow::Owned(inner.replace("\\\"", "\""))
+            } else {
+                Cow::Borrowed(inner)
+            }
+        }
+        Id::Html(s) | Id::Plain(s) | Id::Anonymous(s) => Cow::Borrowed(s),
     }
 }
 
@@ -260,6 +269,13 @@ mod tests {
         );
         // `c` inherits period=5 from the defaults.
         assert!(matches!(dag, Err(DotError::PeriodOnTask(n)) if n == "c"));
+    }
+
+    #[test]
+    fn unescapes_quoted_ids() {
+        let dag = parse_dot(r#"digraph "my \"g\"" { "a \"b\"" [wcet=1, label="x\ny"]; }"#).unwrap();
+        assert_eq!(dag.name, r#"my "g""#);
+        assert_eq!(dag.nodes[0].name, r#"a "b""#);
     }
 
     #[test]
