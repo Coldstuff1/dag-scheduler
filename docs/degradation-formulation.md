@@ -347,7 +347,8 @@ proposed contribution.
 3. **Emit / CLI**: `rt-cli analyze <file.dot>` prints the plan. JSON export. `viz`
    colours nodes by criticality and marks droppable ones.
 4. **Simulator (`rt-sim`)**: discrete-event, periodic sensors, policy-defined
-   activation, pluggable schedulers (baselines vs. plan-driven).
+   activation, pluggable schedulers (baselines vs. plan-driven). Specified in
+   [simulator-spec.md](simulator-spec.md).
 5. **Experiments**: random DAG generator with several rate mixes; heavy-tailed overrun
    and bursty-sensor injection.
 
