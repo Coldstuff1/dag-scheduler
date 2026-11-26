@@ -10,6 +10,9 @@
     "source=dag-scheduler-target,target=${containerWorkspaceFolder}/target,type=volume"
   ],
   "postCreateCommand": "sudo chown -R vscode:vscode /usr/local/cargo/registry ${containerWorkspaceFolder}/target && llvm-config --version && cargo build",
+  "features": {
+    "ghcr.io/duduribeiro/devcontainer-features/neovim:1": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
