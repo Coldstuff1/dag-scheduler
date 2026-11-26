@@ -1,0 +1,27 @@
+{
+  "name": "dag-scheduler (Rust + MLIR 23)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": { "LLVM_VERSION": "23" }
+  },
+  "remoteUser": "vscode",
+  "mounts": [
+    "source=dag-scheduler-cargo-registry,target=/usr/local/cargo/registry,type=volume",
+    "source=dag-scheduler-target,target=${containerWorkspaceFolder}/target,type=volume"
+  ],
+  "postCreateCommand": "sudo chown -R vscode:vscode /usr/local/cargo/registry ${containerWorkspaceFolder}/target && llvm-config --version && cargo build",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "llvm-vs-code-extensions.vscode-mlir",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "mlir.server_path": "/usr/lib/llvm-23/bin/mlir-lsp-server",
+        "mlir.pdll_server_path": "/usr/lib/llvm-23/bin/mlir-pdll-lsp-server",
+        "mlir.tablegen_server_path": "/usr/lib/llvm-23/bin/tblgen-lsp-server"
+      }
+    }
+  }
+}
